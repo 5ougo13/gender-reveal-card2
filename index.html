@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- ✅ Spoiler-free preview metadata (LINE-friendly) -->
+  <title>💌 A Little Surprise</title>
+  <meta name="description" content="ぜひタップして見てね✨" />
+  <meta property="og:title" content="💌 赤ちゃんの性別が分かったよ！" />
+  <meta property="og:description" content="ぜひタップして見てね✨" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://5ougo13.github.io/gender-reveal-card2/" />
+  <!-- Optional: add a neutral preview image in your site root and update the URL -->
+  <!-- <meta property="og:image" content="https://YOUR-SITE-URL-HERE/preview.png" /> -->
+
+  <style>
+    :root{
+      --bg1:#fff3f7;
+      --bg2:#f3fbff;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --shadow: 0 12px 30px rgba(0,0,0,.10);
+      --radius: 22px;
+    }
+    html { -webkit-text-size-adjust: 100%; }
+    *{box-sizing:border-box}
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      min-height: 100svh;
+      min-height: 100dvh;
+      min-height: 100vh;
+      display:grid;
+      place-items:center;
+
+      /* ✅ GIRL: soft pink pastel gradient */
+      background:
+        linear-gradient(
+          90deg,
+          #fff0f6 0%,
+          #ffe6f1 25%,
+          #fff2f7 55%,
+          #ffeaf4 75%,
+          #ffd6ea 100%
+        );
+
+      padding: 16px;
+    }
+
+    .card{
+      width: min(720px, calc(100vw - 32px));
+      background:var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    #fx{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index: 10;
+    }
+
+    .header{
+      padding: 26px 26px 14px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      position:relative;
+      z-index: 2;
+    }
+    .title h1{
+      margin:0;
+      font-size: 28px;
+      letter-spacing:-0.02em;
+    }
+
+    .jp-lead { margin: 8px 0 0; color: var(--muted); line-height: 1.35; }
+    .jp-line { display:block; white-space: nowrap; }
+
+    .pill{
+      font-size: 12px;
+      padding: 8px 10px;
+      border:1px solid #e5e7eb;
+      border-radius: 999px;
+      color:#374151;
+      background:#fafafa;
+      white-space:nowrap;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .stage{
+      padding: 12px 26px 26px;
+      display:grid;
+      gap: 14px;
+      position:relative;
+      z-index: 2;
+    }
+    .scratch-wrap{
+      position:relative;
+      border-radius: 18px;
+      overflow:hidden;
+      border:1px solid #e5e7eb;
+      background: linear-gradient(135deg, #f9fafb, #ffffff);
+    }
+
+    .reveal{
+      padding: 34px 18px;
+      text-align:center;
+
+      /* ✅ GIRL: pink reveal background */
+      background: linear-gradient(180deg, #ffe6f1, #fff2f7);
+    }
+
+    .reveal .big{
+      font-size: clamp(30px, 6vw, 56px);
+      margin: 0;
+      font-weight: 800;
+      letter-spacing:-0.03em;
+    }
+    .reveal .sub{
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    #scratch{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      touch-action: none;
+      cursor: crosshair;
+      z-index: 3;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 8px;
+      position:relative;
+      z-index: 2;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      color:#111827;
+      padding:10px 12px;
+      border-radius: 12px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .btn:hover{background:#fafafa}
+    .hint{
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.4;
+    }
+
+    @media (max-width: 420px){
+      .header{
+        flex-wrap: wrap;
+        align-items: flex-start;
+        padding: 20px 18px 12px;
+        gap: 10px;
+      }
+
+      .title{
+        min-width: 0;
+        flex: 1 1 220px;
+      }
+
+      .pill{
+        flex: 0 0 auto;
+        min-width: 0;
+        max-width: 42vw;
+        padding: 8px 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card" id="card">
+    <canvas id="fx"></canvas>
+
+    <div class="header">
+      <div class="title">
+        <h1>Boy or Girl? 💌</h1>
+        <p class="jp-lead">
+          <span class="jp-line">性別がわかったよ！</span>
+          <span class="jp-line">スクラッチしてみてね！</span>
+        </p>
+      </div>
+      <div class="pill" id="status">Ready to scratch</div>
+    </div>
+
+    <div class="stage">
+      <div class="scratch-wrap" id="wrap" aria-label="Scratch area">
+        <div class="reveal" id="reveal">
+          <!-- ✅ GIRL RESULT -->
+          <p class="big" id="bigText">It’s a GIRL! 🎀</p>
+          <p class="sub" id="subText">We can’t wait for you to meet her 💗</p>
+        </div>
+
+        <canvas id="scratch"></canvas>
+      </div>
+
+      <div class="controls">
+        <div class="hint">
+          Tip: 携帯なら指でスクラッチ。 パソコンならクリックしながらドラッグしてね！🎊<br>
+        </div>
+        <button class="btn" id="resetBtn" type="button">Reset scratch layer</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* -------------------------- Scratch-off behavior -------------------------- */
+
+const canvas = document.getElementById("scratch");
+const wrap = document.getElementById("wrap");
+const statusPill = document.getElementById("status");
+const resetBtn = document.getElementById("resetBtn");
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+let isDown = false;
+let last = null;
+
+const BRUSH_RADIUS = 26;
+const AUTO_REVEAL_THRESHOLD = 0.55;
+
+function resizeScratchCanvasToElement() {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const rect = wrap.getBoundingClientRect();
+  canvas.width  = Math.floor(rect.width * dpr);
+  canvas.height = Math.floor(rect.height * dpr);
+  canvas.style.width = rect.width + "px";
+  canvas.style.height = rect.height + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawScratchLayer() {
+  const w = wrap.getBoundingClientRect().width;
+  const h = wrap.getBoundingClientRect().height;
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "#bfc5cc";
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.globalAlpha = 0.16;
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 8;
+  for (let x = -h; x < w + h; x += 26) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + h, h);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = "#111827";
+  ctx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Scratch here ✨", w / 2, h / 2);
+
+  statusPill.textContent = "Scratch to reveal";
+}
+
+function getPoint(e) {
+  const rect = canvas.getBoundingClientRect();
+  const isTouch = e.touches && e.touches[0];
+  const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+  const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+  return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+function scratchLine(from, to) {
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "rgba(0,0,0,1)";
+  ctx.lineWidth = BRUSH_RADIUS * 2;
+
+  ctx.beginPath();
+  ctx.moveTo(from.x, from.y);
+  ctx.lineTo(to.x, to.y);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(to.x, to.y, BRUSH_RADIUS, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function scratchDot(p) {
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, BRUSH_RADIUS, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function computeScratchedFraction(sampleStep = 8) {
+  const w = canvas.width, h = canvas.height;
+  const img = ctx.getImageData(0, 0, w, h).data;
+  let cleared = 0, total = 0;
+
+  for (let y = 0; y < h; y += sampleStep) {
+    for (let x = 0; x < w; x += sampleStep) {
+      const i = (y * w + x) * 4 + 3;
+      total++;
+      if (img[i] === 0) cleared++;
+    }
+  }
+  return cleared / total;
+}
+
+function maybeAutoReveal() {
+  const frac = computeScratchedFraction(8);
+  if (frac >= AUTO_REVEAL_THRESHOLD) {
+    clearAll(); // triggers confetti
+  } else {
+    statusPill.textContent = `Scratched ${(frac * 100).toFixed(0)}%`;
+  }
+}
+
+/* -------------------------- PINK confetti from top corners -------------------------- */
+
+const fx = document.getElementById("fx");
+const fctx = fx.getContext("2d");
+const card = document.getElementById("card");
+
+let confettiRunning = false;
+let confettiParticles = [];
+let confettiRaf = null;
+
+function resizeFxCanvas() {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const rect = card.getBoundingClientRect();
+
+  fx.width = Math.floor(rect.width * dpr);
+  fx.height = Math.floor(rect.height * dpr);
+  fx.style.width = rect.width + "px";
+  fx.style.height = rect.height + "px";
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* ✅ GIRL: pink palette */
+const PINKS = [
+  "#ffb3c6", "#ff8fab", "#ff5d8f", "#ff4d6d",
+  "#f72585", "#ff6fb1", "#ff9ad5", "#ffc2e2"
+];
+
+function spawnCornerBurst(originX, originY, direction) {
+  const count = 170;
+  const gravityBase = 0.006;
+  const air = 0.990;
+  const spinDrag = 1;
+
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI / 180) * (20 + Math.random() * 140);
+    const speed = 4.5 + Math.random() * 7.5;
+
+    let vx = Math.cos(angle) * speed;
+    let vy = Math.sin(angle) * speed;
+
+    const widthFactor = Math.min(1, card.getBoundingClientRect().width / 700);
+    vx += direction * (3.2 * widthFactor + Math.random() * 2.0 * widthFactor);
+    vy -= (4.5 + Math.random() * 4);
+
+    confettiParticles.push({
+      x: originX + (Math.random() - 0.5) * 10,
+      y: originY + (Math.random() - 0.5) * 10,
+      vx, vy,
+      g: gravityBase + Math.random() * 0.03,
+      air, spinDrag,
+      w: 6 + Math.random() * 10,
+      h: 4 + Math.random() * 8,
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.35,
+      color: PINKS[Math.floor(Math.random() * PINKS.length)],
+      life: 300 + Math.random() * 180,
+      alpha: 1
+    });
+  }
+}
+
+function startConfettiFromCorners() {
+  if (confettiRunning) return;
+  confettiRunning = true;
+
+  resizeFxCanvas();
+
+  const rect = card.getBoundingClientRect();
+  const W = rect.width;
+
+  const inset = 18;
+  const leftX = inset;
+  const leftY = inset;
+  const rightX = W - inset;
+  const rightY = inset;
+
+  confettiParticles = [];
+  spawnCornerBurst(leftX, leftY,  1);
+  spawnCornerBurst(rightX, rightY, -1);
+
+  const start = performance.now();
+
+  function tick(now) {
+    const elapsed = now - start;
+    const r = card.getBoundingClientRect();
+    const w = r.width;
+    const h = r.height;
+
+    fctx.clearRect(0, 0, w, h);
+
+    for (const p of confettiParticles) {
+      p.vx *= p.air;
+      p.vy = p.vy * p.air + p.g;
+      p.vx += (Math.random() - 0.5) * 0.0030;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      p.vr *= p.spinDrag;
+      p.rot += p.vr;
+
+      p.life -= 1;
+      if (p.life < 70) p.alpha = Math.max(0, p.life / 70);
+
+      if (p.x < -60) p.x = w + 60;
+      if (p.x > w + 60) p.x = -60;
+
+      fctx.save();
+      fctx.translate(p.x, p.y);
+      fctx.rotate(p.rot);
+      fctx.globalAlpha = p.alpha;
+      fctx.fillStyle = p.color;
+      fctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      fctx.restore();
+    }
+
+    confettiParticles = confettiParticles.filter(p => p.life > 0 && p.y < h + 180);
+
+    if (confettiParticles.length > 0 && elapsed < 11000) {
+      confettiRaf = requestAnimationFrame(tick);
+    } else {
+      confettiRunning = false;
+      confettiParticles = [];
+      confettiRaf = null;
+      fctx.clearRect(0, 0, w, h);
+    }
+  }
+
+  confettiRaf = requestAnimationFrame(tick);
+}
+
+function stopAndClearConfetti() {
+  confettiRunning = false;
+  confettiParticles = [];
+  if (confettiRaf) cancelAnimationFrame(confettiRaf);
+  confettiRaf = null;
+
+  const r = card.getBoundingClientRect();
+  fctx.clearRect(0, 0, r.width, r.height);
+}
+
+/* -------------------------- Reveal + reset -------------------------- */
+
+let revealedOnce = false;
+
+function clearAll() {
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  statusPill.textContent = "Revealed 🎉";
+
+  if (!revealedOnce) {
+    revealedOnce = true;
+    startConfettiFromCorners();
+  }
+}
+
+function onDown(e) {
+  e.preventDefault();
+  isDown = true;
+  const p = getPoint(e);
+  last = p;
+  scratchDot(p);
+}
+function onMove(e) {
+  if (!isDown) return;
+  e.preventDefault();
+  const p = getPoint(e);
+  if (last) scratchLine(last, p);
+  last = p;
+}
+function onUp(e) {
+  if (!isDown) return;
+  e.preventDefault();
+  isDown = false;
+  last = null;
+  maybeAutoReveal();
+}
+
+function resetScratchCard() {
+  revealedOnce = false;
+  stopAndClearConfetti();
+  resizeScratchCanvasToElement();
+  drawScratchLayer();
+  resizeFxCanvas();
+  statusPill.textContent = "Ready to scratch";
+}
+
+canvas.addEventListener("mousedown", onDown);
+window.addEventListener("mousemove", onMove);
+window.addEventListener("mouseup", onUp);
+
+canvas.addEventListener("touchstart", onDown, { passive: false });
+canvas.addEventListener("touchmove", onMove, { passive: false });
+canvas.addEventListener("touchend", onUp, { passive: false });
+
+resetBtn.addEventListener("click", resetScratchCard);
+
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    resizeScratchCanvasToElement();
+    resizeFxCanvas();
+    if (!revealedOnce) {
+      drawScratchLayer();
+    }
+  }, 120);
+});
+
+resetScratchCard();
+</script>
+</body>
+</html>
